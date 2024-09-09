@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "pwm.h"
 
 // 중간중간에 일부러 문자열로 다 넣고 하드코딩 한 부분 있어요 
 // 어차피 젯슨 나노로 장비는 고정되어 있으니까요!
@@ -113,7 +114,7 @@ int setPwm(int num, int period, int duty){
 		return -1;
 	}
 	
-	if (period_fd == -1 | duty_fd == -1) {
+	if ((period_fd == -1) | (duty_fd == -1)) {
 		perror("Open period_fd | duty_fd error");
 		return -1;
 	}
@@ -162,14 +163,59 @@ int enablePwm(int num){
 		return -1;
 	}
 	close(enable_fd);
-	
 	return 0;
 }
 
-int main(){
-	exportPwm(0);
-	setPwm(0, 20000000, 1000000);
-	enablePwm(0);
+// pwm 번호를 입력 해주면 enable을 해제
+int disablePwm(int num){
+	int enable_fd;
+	if (num == 0){
+		enable_fd = open("/sys/class/pwm/pwmchip0/pwm0/enable", O_WRONLY | O_TRUNC);
+	} 
+	else if(num == 4){
+		enable_fd = open("/sys/class/pwm/pwmchip4/pwm4/enable", O_WRONLY | O_TRUNC);
+	} 
+	else {
+		perror("PWM number error");
+		return -1;
+	}
+	
+	if (enable_fd == -1) {
+		perror("Open disable_fd ");
+		return -1;
+	}
+	
+	if (write(enable_fd, "0", 1) != 1){
+		perror("disable_fd - write error");
+		return -1;
+	}
+	close(enable_fd);
+	return 0;
+}
 
+// pwm 번호를 입력 해주면 unexport
+int unexportPwm(int num){
+	int unexport_fd;
+	if (num == 0){
+		unexport_fd = open("/sys/class/pwm/pwmchip0/unexport", O_WRONLY | O_TRUNC);
+	} 
+	else if(num == 4){
+		unexport_fd = open("/sys/class/pwm/pwmchip4/unexport", O_WRONLY | O_TRUNC);
+	} 
+	else {
+		perror("PWM number error");
+		return -1;
+	}
+	
+	if (unexport_fd == -1) {
+		perror("Open unexport");
+		return -1;
+	}
+	
+	if (write(unexport_fd, "0", 1) != 1){
+		perror("unexport_fd - write error");
+		return -1;
+	}
+	close(unexport_fd);
 	return 0;
 }
