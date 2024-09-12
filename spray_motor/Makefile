@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-g 
-OBJS=main.o itoa.o pwm.o gpio.o gpioModule.o timerTest.o
+OBJS=main.o itoa.o pwm.o gpio.o gpioModule.o motorCtl.o
 TARGET=main.out
 
 

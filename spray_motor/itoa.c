@@ -1,6 +1,20 @@
 #include <stdbool.h>
+#include <time.h>
 #include "itoa.h"
 
+
+int waitCtl(float time){
+	clock_t start_time = clock();
+	clock_t end_time;
+	double time_elapsed = 0;
+       
+	while (time_elapsed < time){
+		end_time = clock();
+		time_elapsed = (float)(end_time - start_time) / CLOCKS_PER_SEC;
+	}
+
+	return 0;
+}
 
 void reverse(char str[], int length) {
         int start = 0;
