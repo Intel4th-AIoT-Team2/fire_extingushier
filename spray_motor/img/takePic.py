@@ -1,4 +1,5 @@
 import cv2
+import os
 import sys
 
 
@@ -9,7 +10,7 @@ if cam.isOpened():
 
     if ret:
         # 프레임을 BGR에서 RGB로 변환
-        cv2.imwrite("img/"+sys.argv[1], frame)
+        cv2.imwrite(os.path.join("img", sys.argv[1]), frame)
 
     cam.release()  # 카메라 해제
 else:
