@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 
 	// 사진 검사 
 	workAI();
-	fire_flag = findPos(&angle_x, &angle_y);
+	//fire_flag = findPos(&angle_x, &angle_y);
 
 	// 촬영한 방향에 불이 없으면
 	if(!fire_flag){
