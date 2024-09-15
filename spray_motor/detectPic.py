@@ -18,6 +18,7 @@ def sigusr1_handler(signum, frame):
     for image_file in image_files:
         image_path = os.path.join(image_folder, image_file)
         img = Image.open(image_path)
+
         results = model(img)
         result = results[0]
 
@@ -29,11 +30,12 @@ def sigusr1_handler(signum, frame):
             with open(output_path, 'w') as f:
                 for box in result[0].boxes.xyxy.cpu().numpy():
                     xmin, ymin, xmax, ymax = box  # Unpack the coordinates
-                    f.write("{:.2f} {:.2f} {:.2f} {:.2f}\n".format(xmin, ymin, xmax, ymax))
+                    f.write("{:.2f} {:.2f}\n".format((xmax-xmin)/2.0, (ymax-ymin)/2.0))
+
     os.kill(ppid, signal.SIGUSR1);
 
 signal.signal(signal.SIGUSR1, sigusr1_handler)
-os.kill(ppid, signal.SIGUSR1);
+os.kill(ppid, signal.SIGUSR1)
 
 while(1):
     time.sleep(1)

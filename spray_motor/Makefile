@@ -10,7 +10,6 @@ $(TARGET) : $(OBJS)
 all : $(TARGET)
 
 clean:
-	rm -f *.jpg
 	rm -f *.o
 	rm -f $(TARGET)
 	rm -f img/*.txt

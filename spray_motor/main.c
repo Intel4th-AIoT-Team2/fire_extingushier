@@ -14,6 +14,7 @@
 int onAI();
 int offAI();
 int workAI();
+void rmText();
 
 bool findPos(char *angle_x, char *angle_y);
 
@@ -26,12 +27,7 @@ int pid_ai = 0;
 int main(int argc, char *argv[]){
 	bool fire_flag;
 	char angle_x, angle_y;
-///	
-	// 입력 받은 값으로 테스트 
-	fire_flag = atoi(argv[1]);
-//*
-	// motor init	
-//	enPwm();
+
 	// ai 스레드 초기화
 	onAI();
 	workAI();	
@@ -46,18 +42,19 @@ int main(int argc, char *argv[]){
 	takePic("front.jpg");
 
 	// 좌측 
-	controlMotorAngle(2, 30);
-	waitCtl(0.5);
-	takePic("left.jpg");
-
-	// 우측 
-	controlMotorAngle(2, 150);
+	controlMotorAngle(2, 20);
 	waitCtl(0.5);
 	takePic("right.jpg");
 
+	// 우측 
+	controlMotorAngle(2, 160);
+	waitCtl(0.5);
+	takePic("left.jpg");
+
 	// 사진 검사 
 	workAI();
-	//fire_flag = findPos(&angle_x, &angle_y);
+
+	fire_flag = findPos(&angle_x, &angle_y);
 
 	// 촬영한 방향에 불이 없으면
 	if(!fire_flag){
@@ -74,12 +71,10 @@ int main(int argc, char *argv[]){
 	
 	// 활영한 방향에 불이 있으면 
 	if (fire_flag){
+		puts("여긴가");
 		// 사진의 세로 픽셀 값을 동해서 각도 추정
 
 		// 방향 회전	
-		controlMotorAngle(0, atoi(argv[2]));
-		controlMotorAngle(2, atoi(argv[3]));
-
 		controlMotorAngle(0, angle_x);
 		controlMotorAngle(2, angle_y);
 		waitCtl(0.5);
@@ -105,9 +100,6 @@ int main(int argc, char *argv[]){
 	controlMotorAngle(0, 90);
 	controlMotorAngle(2, 90);
 	waitCtl(0.5);
-
-	// motor disable
-//	disPwm();
 
 	// ai 프로세스 끄기 
 	offAI();
@@ -190,6 +182,7 @@ int onAI(){
 
 // 사진 검사 신호를 보내는 함수 
 int workAI(){
+	rmText();
 	sigset_t set;
 
 	// SIGUSR1 handler 등록 
@@ -208,15 +201,8 @@ int workAI(){
 
 // 사진을 검사하는 ai를 끄는 함수 
 int offAI(){
-	char *strPath[3] = {"img/front.jpg", "img/left.jgp", "img/right.jpg"};
-	int result;
-
 	kill(pid_ai, SIGKILL);	
-	for (int i=0;i<3;i++){
-		result = remove(strPath[i]);
-		if(result)
-			puts("remove error");
-	}
+	rmText();
 
 	return 0;
 }
@@ -229,11 +215,45 @@ void handler(int signo) {
 
 // 출력되어 있는 좌표값으로 화재의 유무와 위치를 판단하는 함수 
 bool findPos(char *angle_x, char *angle_y){
-	// 640 - 480
-	
 
+	// 사진 크기 - 640x480
+		// 각 7.7픽셀당 1도로 상정 
+	FILE *rfp;
+	char buf[16];
+	char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
+
+        for (int i=0;i<3;i++){
+		if ((rfp = fopen(strPath[i], "r")) == NULL) {
+			continue;
+		}
+
+		if (fgets(buf, BUFSIZ, rfp) != NULL) {
+			*angle_x = (int)(atof(strtok(buf, " ")) * 7.7);
+			*angle_y = (int)(atof(strtok(buf, " ")) * 7.7);
+
+			if(i==0) *angle_x += 55;
+			else if(i==2) *angle_x += 110;
+
+			fclose(rfp);
+
+			return true;
+		}
+	}
+
+	rmText();
+
+	return false;	
 }
 
+// ai의 결과를 삭제하기 위해서 돌리는 함수 
+void rmText(){
+        char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
+
+        for (int i=0;i<3;i++)
+                remove(strPath[i]);
+}
+
+	
 /*
 int angleSpary(int vert, int horiz){
 	enPwm();
