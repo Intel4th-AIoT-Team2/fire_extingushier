@@ -11,7 +11,7 @@
 #include "ai.h"
 
 // 사진을 찍어서 filename으로 저장하는 함수
-int takePic(char *filename){
+int takePic(const char *filename){
 	int status;
 	char pyPath[100];
 	pid_t pid = fork();
@@ -121,7 +121,7 @@ bool findPos(char *angle_x, char *angle_y){
 		// 각 7.7픽셀당 1도로 상정
 	FILE *rfp;
 	char buf[16];
-	char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
+	const char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
 
         for (int i=0;i<3;i++){
 		if ((rfp = fopen(strPath[i], "r")) == NULL) {
@@ -148,7 +148,7 @@ bool findPos(char *angle_x, char *angle_y){
 
 // ai의 결과를 삭제하기 위해서 돌리는 함수
 void rmText(){
-        char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
+        const char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
 
         for (int i=0;i<3;i++)
                 remove(strPath[i]);

@@ -1,17 +1,22 @@
-CC=gcc
-CFLAGS=-g 
-OBJS=main.o modules/itoa.o modules/ai.o modules/pwm.o modules/gpio.o modules/gpioModule.o modules/motorCtl.o
-TARGET=main.out
+CC = g++  # 또는 gcc
+CFLAGS = -g
 
+OBJS = main.o modules/itoa.o modules/ai.o modules/pwm.o modules/gpio.o modules/gpioModule.o modules/motorCtl.o
+TARGET = main.out
 
-$(TARGET) : $(OBJS)
-	$(MAKE) -C modules
+all: $(TARGET)
+$(TARGET): $(OBJS)
 	$(CC) -o $@ $(OBJS)
 
-all : $(OBJS)
+main.o: main.c
+	$(CC) $(CFLAGS) -c main.c
+
+modules/%.o: modules/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+modules:
+	$(MAKE) -C modules
 
 clean:
-	$(MAKE) -C modules clean
-	rm -f *.o
-	rm -f $(TARGET)
-	rm -f img/*.txt
+	rm -f $(OBJS) $(TARGET)
+
