@@ -9,6 +9,7 @@
 
 
 #include "ai.h"
+#include "itoa.h"
 
 // 사진을 찍어서 filename으로 저장하는 함수
 int takePic(const char *filename){
@@ -115,10 +116,10 @@ void handler(int signo) {
 }
 
 // 출력되어 있는 좌표값으로 화재의 유무와 위치를 판단하는 함수
-bool findPos(char *angle_x, char *angle_y){
+bool findPos(int *angle_x, int *angle_y){
 
 	// 사진 크기 - 640x480
-		// 각 7.7픽셀당 1도로 상정
+		// 각 9.8픽셀당 1도로 상정
 	FILE *rfp;
 	char buf[16];
 	const char *strPath[3] = {"img/front.txt", "img/left.txt", "img/right.txt"};
@@ -129,11 +130,19 @@ bool findPos(char *angle_x, char *angle_y){
 		}
 
 		if (fgets(buf, BUFSIZ, rfp) != NULL) {
-			*angle_x = (int)(atof(strtok(buf, " ")) * 7.7);
-			*angle_y = (int)(atof(strtok(buf, " ")) * 7.7);
+			*angle_x = (int)(atof(strtok(buf, " ")) / 9.8);
+			*angle_y = (int)(atof(strtok(buf, " ")) / 9.8);
 
 			if(i==0) *angle_x += 55;
 			else if(i==2) *angle_x += 110;
+
+			*angle_x = 180-*angle_x;
+			*angle_y = 180-*angle_y;
+
+			itoa(*angle_x, buf, 10);
+			puts(buf);
+			itoa(*angle_y, buf, 10);
+			puts(buf);
 
 			fclose(rfp);
 

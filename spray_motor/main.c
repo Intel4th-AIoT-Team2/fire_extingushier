@@ -1,24 +1,52 @@
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
+#include <sys/types.h>
 
 #include "modules/ai.h"
 #include "modules/itoa.h"
 #include "modules/motorCtl.h"
 #include "modules/gpioModule.h"
+#include "modules/signalSender.h"
 
 
-int pid_ai = 0;
 
 // 터틀봇 도착시 실행되는 함수 
 int main(int argc, char* argv[]) {
+	int pid_ai = 0;
+	
+	FILE *fp;
+	char buf[6]; 
+
 	bool fire_flag;
-	char angle_x, angle_y;
+	int angle_x, angle_y;	
 
 	// ai 스레드 초기화
-	onAI(&pid_ai);
-	workAI(&pid_ai);
+//	onAI(&pid_ai);
+//	workAI(&pid_ai);
+
+	// ai thread의 pid 가져오기 	
+	if ((fp = fopen("ai_process.txt", "r")) == NULL) {
+		perror("fopen:ai ");
+		exit(1);
+	}
+	fgets(buf, BUFSIZ, fp);
+	pid_ai = atoi(buf);
+
+	fclose(fp);
+
+	// 현재 thread의 pid 넘겨주기
+	if ((fp = fopen("main_process.txt", "w")) == NULL) {
+                perror("fopen:main ");
+                exit(1);
+        }
+	itoa(getpid(), buf, 10);
+	fputs(buf, fp);
+
+        fclose(fp);	
+
 
 	// 카메라를 통해서 사진 촬영
 	// 상하 각도를 정면을 바라보도록 변경 
@@ -26,18 +54,24 @@ int main(int argc, char* argv[]) {
 
 	// 정면
 	controlMotorAngle(2, 90);
-	waitCtl(0.5);
-	takePic("front.jpg");
+	waitCtl(2);
+//	takePic("front.jpg");
+	sendSignal(0);
 
 	// 좌측 
 	controlMotorAngle(2, 20);
-	waitCtl(0.5);
-	takePic("right.jpg");
+	waitCtl(2);
+//	takePic("right.jpg");
+	sendSignal(1);
 
 	// 우측 
 	controlMotorAngle(2, 160);
-	waitCtl(0.5);
-	takePic("left.jpg");
+	waitCtl(2);
+//	takePic("left.jpg");
+	sendSignal(2);
+
+	// 사진 수신 대기 
+	waitCtl(0.3);
 
 	// 사진 검사 
 	workAI(&pid_ai);
@@ -53,19 +87,19 @@ int main(int argc, char* argv[]) {
 
 
 		// 없으면 복귀
-
+		
 	}
 
 
 	// 활영한 방향에 불이 있으면 
 	if (fire_flag) {
-		puts("여긴가");
 		// 사진의 세로 픽셀 값을 동해서 각도 추정
 
 		// 방향 회전	
-		controlMotorAngle(0, angle_x);
-		controlMotorAngle(2, angle_y);
+		controlMotorAngle(0, angle_y);
+		controlMotorAngle(2, angle_x);
 		waitCtl(0.5);
+//		printf("%d %d \n", angle_x, angle_y);
 
 		// 스프레이 on
 		toggleSpray(78);
@@ -76,7 +110,7 @@ int main(int argc, char* argv[]) {
 			// cam에서 불 확인 
 
 			// 테스트 용으로 5초 대기 후 종료
-			waitCtl(3);
+			waitCtl(10);
 			break;
 		}
 
@@ -89,8 +123,11 @@ int main(int argc, char* argv[]) {
 	controlMotorAngle(2, 90);
 	waitCtl(0.5);
 
+	// 모터 작동 종료 츌력
+	puts("main ended");
+
 	// ai 프로세스 끄기 
-	offAI(&pid_ai);
+//	offAI(&pid_ai);
 
 	return 0;
 }

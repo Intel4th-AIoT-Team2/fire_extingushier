@@ -7,11 +7,11 @@
 
 #define PERIOD 20000000
 
+// 듀티비가 1~2ms 라서 각도 값을 해당 범우로 환산
 int controlMotorAngle(int pin, int angle){
-	float duty = (angle / 180.0 + 1) * 1000000;
+	float duty = (((float)angle / 180.0) + 1) * 1000000;
 
-	setPwm(pin, PERIOD, duty);
-
+	setPwm(pin, PERIOD, (int)duty);
 	enablePwm(pin);
 
 	return 0;

@@ -78,13 +78,13 @@ int setPwm(int num, int period, int duty){
 	itoa(duty, duty_str, 10);
 
 	tmp = strlen(period_str);
-	if (write(period_fd , period_str, tmp) != tmp) {
+	if (write(period_fd, period_str, tmp) != tmp) {
 		perror("period_fd - write error");
 		return -1;
 	}
 
 	tmp = strlen(duty_str);
-	if (write(duty_fd , duty_str, tmp ) != tmp) {
+	if (write(duty_fd, duty_str, tmp ) != tmp) {
 		perror("duty_fd - write error");
 		return -1;
 	}

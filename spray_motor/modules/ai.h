@@ -6,7 +6,7 @@ int offAI(int *);
 int workAI(int *);
 void rmText();
 
-bool findPos(char *angle_x, char *angle_y);
+bool findPos(int *angle_x, int *angle_y);
 
 void handler(int signo);
 int takePic(const char *filename);

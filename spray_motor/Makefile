@@ -1,7 +1,7 @@
-CC = g++  # 또는 gcc
+CC = gcc  # 또는 gcc
 CFLAGS = -g
 
-OBJS = main.o modules/itoa.o modules/ai.o modules/pwm.o modules/gpio.o modules/gpioModule.o modules/motorCtl.o
+OBJS = main.o modules/itoa.o modules/ai.o modules/signalSender.o modules/pwm.o modules/gpio.o modules/gpioModule.o modules/motorCtl.o
 TARGET = main.out
 
 all: $(TARGET)
@@ -19,4 +19,6 @@ modules:
 
 clean:
 	rm -f $(OBJS) $(TARGET)
+	rm -f img/*.txt
+	rm -f *.out
 
